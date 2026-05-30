@@ -1,0 +1,163 @@
+{
+  "title": "Quench — Semantic Cache",
+  "uid": "quench-v1",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "panels": [
+    {
+      "id": 1,
+      "title": "Cache Hit Rate",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 80 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "textMode": "auto", "colorMode": "background" },
+      "targets": [
+        {
+          "expr": "100 * sum(rate(quench_requests_total{result=\"hit\"}[5m])) / sum(rate(quench_requests_total[5m]))",
+          "legendFormat": "Hit rate"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Cost Saved (USD)",
+      "type": "stat",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4,
+          "color": { "mode": "fixed", "fixedColor": "green" }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "textMode": "auto", "colorMode": "background" },
+      "targets": [
+        {
+          "expr": "sum(quench_cost_saved_usd_total)",
+          "legendFormat": "Total saved"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Cache Entries",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "blue" } }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "textMode": "auto", "colorMode": "value" },
+      "targets": [
+        {
+          "expr": "quench_cache_entries_total",
+          "legendFormat": "Entries"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "P95 Latency — Hit vs Miss (ms)",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "fieldConfig": {
+        "defaults": { "unit": "ms" }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "horizontal", "textMode": "auto", "colorMode": "value" },
+      "targets": [
+        {
+          "expr": "1000 * histogram_quantile(0.95, sum by(le) (rate(quench_latency_seconds_bucket{result=\"hit\"}[5m])))",
+          "legendFormat": "hit p95"
+        },
+        {
+          "expr": "1000 * histogram_quantile(0.95, sum by(le) (rate(quench_latency_seconds_bucket{result=\"miss\"}[5m])))",
+          "legendFormat": "miss p95"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Request Rate by Result",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "fillOpacity": 15 } }
+      },
+      "options": { "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "expr": "sum by(result) (rate(quench_requests_total[1m]))",
+          "legendFormat": "{{ result }}"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Latency Percentiles",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "ms", "custom": { "fillOpacity": 10 } }
+      },
+      "options": { "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "expr": "1000 * histogram_quantile(0.50, sum by(result, le) (rate(quench_latency_seconds_bucket[1m])))",
+          "legendFormat": "p50 {{ result }}"
+        },
+        {
+          "expr": "1000 * histogram_quantile(0.95, sum by(result, le) (rate(quench_latency_seconds_bucket[1m])))",
+          "legendFormat": "p95 {{ result }}"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Similarity Score Distribution",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 6 },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "min": 0, "max": 1 }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum by(le) (rate(quench_similarity_score_bucket[5m])))",
+          "legendFormat": "p50 similarity"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(quench_similarity_score_bucket[5m])))",
+          "legendFormat": "p95 similarity"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Embed Latency P95 (ms)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 6 },
+      "fieldConfig": {
+        "defaults": { "unit": "ms" }
+      },
+      "targets": [
+        {
+          "expr": "1000 * histogram_quantile(0.95, sum by(embedder, le) (rate(quench_embed_latency_seconds_bucket[1m])))",
+          "legendFormat": "{{ embedder }}"
+        }
+      ]
+    }
+  ]
+}

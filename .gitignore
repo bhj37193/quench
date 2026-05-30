@@ -1,0 +1,25 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Runtime / data
+*.db
+.env
+
+# OS
+.DS_Store
+
+# AI assistant artifacts (not needed for prod)
+CLAUDE.md
+primer.md
+planning/
+design/
+**/CONTEXT.md
+.omc/
+.claude/
+.gstack/
+skills-lock.json
+evals/runs/

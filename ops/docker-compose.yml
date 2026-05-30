@@ -1,0 +1,57 @@
+services:
+  quench:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "4141:4141"
+    environment:
+      - UPSTREAM_BASE_URL=${UPSTREAM_BASE_URL:-https://api.openai.com/v1}
+      - UPSTREAM_API_KEY=${UPSTREAM_API_KEY}
+      - UPSTREAM_PROVIDER=${UPSTREAM_PROVIDER:-}
+      - SIMILARITY_THRESHOLD=${SIMILARITY_THRESHOLD:-0.82}
+      - TEMP_CACHE_MAX=${TEMP_CACHE_MAX:-0.3}
+      - QDRANT_URL=http://qdrant:6333
+      - EMBEDDER=${EMBEDDER:-local}
+      - DEFAULT_TTL_SECONDS=${DEFAULT_TTL_SECONDS:-86400}
+    depends_on:
+      - qdrant
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:v1.13.6
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.4.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.0.1
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=quench
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  qdrant_data:
+  grafana_data:

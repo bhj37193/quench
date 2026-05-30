@@ -1,0 +1,156 @@
+[
+  {
+    "label": "capital-of-france [seed]",
+    "type": "seed",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "What is the capital of France?"}
+    ],
+    "cached_answer": "The capital of France is Paris."
+  },
+  {
+    "label": "capital-of-france [exact repeat]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "What is the capital of France?"}
+    ],
+    "cached_answer": "The capital of France is Paris."
+  },
+  {
+    "label": "capital-of-france [paraphrase: which city]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Which city is the capital of France?"}
+    ],
+    "cached_answer": "The capital of France is Paris."
+  },
+  {
+    "label": "capital-of-france [paraphrase: name the capital]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Name the capital city of France."}
+    ],
+    "cached_answer": "The capital of France is Paris."
+  },
+
+  {
+    "label": "http-404 [seed]",
+    "type": "seed",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "What does HTTP 404 mean?"}
+    ],
+    "cached_answer": "HTTP 404 means 'Not Found' — the server could not find the requested resource."
+  },
+  {
+    "label": "http-404 [paraphrase: error code]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "What is the meaning of a 404 error?"}
+    ],
+    "cached_answer": "HTTP 404 means 'Not Found' — the server could not find the requested resource."
+  },
+  {
+    "label": "http-404 [paraphrase: explain 404]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Explain what a 404 status code means in HTTP."}
+    ],
+    "cached_answer": "HTTP 404 means 'Not Found' — the server could not find the requested resource."
+  },
+
+  {
+    "label": "reverse-string-python [seed]",
+    "type": "seed",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a Python expert."},
+      {"role": "user", "content": "How do I reverse a string in Python?"}
+    ],
+    "cached_answer": "You can reverse a string in Python using slicing: `s[::-1]`."
+  },
+  {
+    "label": "reverse-string-python [paraphrase: flip string]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a Python expert."},
+      {"role": "user", "content": "What is the Python way to flip a string backwards?"}
+    ],
+    "cached_answer": "You can reverse a string in Python using slicing: `s[::-1]`."
+  },
+  {
+    "label": "reverse-string-python [paraphrase: reverse str]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a Python expert."},
+      {"role": "user", "content": "Show me how to reverse a str in Python."}
+    ],
+    "cached_answer": "You can reverse a string in Python using slicing: `s[::-1]`."
+  },
+
+  {
+    "label": "what-is-ml [seed]",
+    "type": "seed",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "What is machine learning?"}
+    ],
+    "cached_answer": "Machine learning is a branch of AI where systems learn from data to make predictions or decisions without being explicitly programmed."
+  },
+  {
+    "label": "what-is-ml [paraphrase: define ML]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Can you define machine learning for me?"}
+    ],
+    "cached_answer": "Machine learning is a branch of AI where systems learn from data to make predictions or decisions without being explicitly programmed."
+  },
+  {
+    "label": "what-is-ml [paraphrase: explain ML]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Explain machine learning in simple terms."}
+    ],
+    "cached_answer": "Machine learning is a branch of AI where systems learn from data to make predictions or decisions without being explicitly programmed."
+  },
+
+  {
+    "label": "cross-context-guard [seed: coding context]",
+    "type": "seed",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a Python expert."},
+      {"role": "user", "content": "What is a list?"}
+    ],
+    "cached_answer": "In Python, a list is an ordered, mutable collection of items: `[1, 2, 3]`."
+  },
+  {
+    "label": "cross-context-guard [query: different system prompt — MUST MISS]",
+    "type": "query",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "system", "content": "You are a biology tutor."},
+      {"role": "user", "content": "What is a list?"}
+    ],
+    "cached_answer": "In Python, a list is an ordered, mutable collection of items: `[1, 2, 3]`."
+  }
+]
