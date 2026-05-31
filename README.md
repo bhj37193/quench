@@ -30,17 +30,7 @@ client = OpenAI(base_url="http://localhost:4141/v1", api_key="...")
 
 No other code changes. No schema changes. No prompt changes.
 
-```mermaid
-flowchart TD
-    A([Your App — OpenAI SDK]) --> B[Quench :4141]
-    B --> C[embed conversation]
-    C --> D[hash model + params + system_prompt → partition key]
-    D --> E{search Qdrant\ncosine ≥ 0.82}
-    E -->|HIT| F([return cached response · instant · no upstream call])
-    E -->|MISS| G[Upstream provider\nOpenAI / Anthropic / any]
-    G --> H[store in Qdrant]
-    H --> I([return to client])
-```
+![Quench architecture](https://raw.githubusercontent.com/bhj37193/quench/main/assets/architecture.png)
 
 On a cache miss, the response is stored. On subsequent hits, Quench returns it in under 16 ms — no upstream call, no token spend. A background eviction loop clears entries past their TTL.
 
