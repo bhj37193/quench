@@ -8,11 +8,11 @@
 
 ## The problem
 
-Exact-match caching fails for LLMs. Users rarely type the same thing twice — "What's the capital of France?" and "Which city is France's capital?" are the same question. An exact hash sees two different strings and calls the upstream both times.
+Exact-match caching fails for LLMs. Users rarely type the same thing twice. "What's the capital of France?" and "Which city is France's capital?" are the same question. An exact hash sees two different strings and calls the upstream both times.
 
 Semantic caching fixes this. Quench embeds every conversation, searches for a match by cosine similarity, and returns the cached response when one exists. The upstream call never happens.
 
-The second problem is context bleed. Same user question, different system prompts — customer support and code assistant — should never share a cache. Quench partitions by a hash of model + params + system prompt. Cross-context false positives are structurally impossible.
+The second problem is context bleed. Same user question, different system prompts (customer support and code assistant) should never share a cache. Quench partitions by a hash of model + params + system prompt. Cross-context false positives are structurally impossible.
 
 **Eval: 90% hit rate on a paraphrase workload. 0 false positives. P95 cache hit latency: 15.6 ms.**
 
@@ -24,7 +24,7 @@ The second problem is context bleed. Same user question, different system prompt
 # Before
 client = OpenAI(api_key="...")
 
-# After — one line changed
+# After: one line changed
 client = OpenAI(base_url="http://localhost:4141/v1", api_key="...")
 ```
 
@@ -32,7 +32,7 @@ No other code changes. No schema changes. No prompt changes.
 
 ![Quench architecture](https://raw.githubusercontent.com/bhj37193/quench/main/assets/architecture.png)
 
-On a cache miss, the response is stored. On subsequent hits, Quench returns it in under 16 ms — no upstream call, no token spend. A background eviction loop clears entries past their TTL.
+On a cache miss, the response is stored. On subsequent hits, Quench returns it in under 16 ms with no upstream call and no token spend. A background eviction loop clears entries past their TTL.
 
 The local embedder (`all-MiniLM-L6-v2`) runs in-process and embeds in ~5 ms. An OpenAI embedder is available for production quality. Both produce 384-dimensional normalized vectors; the Qdrant collection is compatible with either without reconfiguration.
 
@@ -45,25 +45,25 @@ The decisions are as much about what got cut as what stayed.
 - **No LangChain / LlamaIndex.** The proxy is 5 files. Adding a framework would triple the surface area for zero added functionality.
 - **Qdrant over FAISS.** FAISS is in-memory with manual persistence. Qdrant is docker-composeable and supports TTL natively via payload filters. The switch costs nothing at the API layer.
 - **Local embedder by default.** Free, ~5 ms, runs in-process. OpenAI embeddings are a one-line config change for anyone who wants higher similarity quality.
-- **Partition-scoped search.** Partitioning by `SHA256(model + params + system_prompt)` makes cross-context false positives structurally impossible — not just unlikely.
+- **Partition-scoped search.** Partitioning by `SHA256(model + params + system_prompt)` makes cross-context false positives structurally impossible, not just unlikely.
 - **Live threshold tuning.** The similarity cutoff is adjustable at runtime without a restart. You can tighten or loosen it against a live workload and watch the hit rate respond in Grafana.
 
 ---
 
 ## Eval results
 
-Measured on a golden workload of 4 topics × repeated paraphrases. `evals/run_eval.py` runs deterministically — no API calls, no stochastic variation.
+Measured on a golden workload of 4 topics × repeated paraphrases. `evals/run_eval.py` runs deterministically, with no API calls and no stochastic variation.
 
 | Metric | Value |
 |--------|-------|
 | Hit rate (paraphrase workload) | **90%** |
 | Hit rate (warm cache replay) | **100%** |
-| P95 latency — cache hit | **15.6 ms** |
+| P95 latency (cache hit) | **15.6 ms** |
 | Fidelity (cached vs original) | **1.0000** |
 | False positives | **0** |
 | Requests simulated | 1,800+ |
 
-Fidelity of 1.0000 means the cached response is semantically identical to what the model would return — not an approximation.
+Fidelity of 1.0000 means the cached response is semantically identical to what the model would return, not an approximation.
 
 ---
 
@@ -99,7 +99,7 @@ Services:
 - **Quench** → `:4141` (proxy)
 - **Qdrant** → `:6333` (vector store, persistent)
 - **Prometheus** → `:9090` (metrics)
-- **Grafana** → `:3000` (dashboards — login: admin/quench)
+- **Grafana** → `:3000` (dashboards, login: admin/quench)
 
 The Grafana dashboard auto-provisions with panels for hit rate, cost saved, latency distribution, and similarity score distribution.
 
@@ -120,8 +120,8 @@ The Grafana dashboard auto-provisions with panels for hit rate, cost saved, late
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `UPSTREAM_BASE_URL` | `https://api.openai.com/v1` | Upstream API endpoint |
-| `UPSTREAM_API_KEY` | — | API key for upstream provider |
-| `UPSTREAM_PROVIDER` | — | Set to `anthropic` for Anthropic |
+| `UPSTREAM_API_KEY` | (none) | API key for upstream provider |
+| `UPSTREAM_PROVIDER` | (none) | Set to `anthropic` for Anthropic |
 | `SIMILARITY_THRESHOLD` | `0.82` | Cosine similarity cutoff |
 | `TEMP_CACHE_MAX` | `0.3` | Requests above this temperature bypass cache |
 | `QDRANT_URL` | `:memory:` | Qdrant connection (`:memory:` = in-process, no Docker needed) |
@@ -169,7 +169,7 @@ quench_embed_latency_seconds{embedder}      # embedding latency
 python -m evals.run_eval
 ```
 
-Runs a 15-item golden workload (seeds, paraphrases, and deliberate misses) and reports hit rate, fidelity, and false positives. This is the money metric — run it after tuning the similarity threshold.
+Runs a 15-item golden workload (seeds, paraphrases, and deliberate misses) and reports hit rate, fidelity, and false positives. This is the money metric; run it after tuning the similarity threshold.
 
 ---
 
@@ -187,7 +187,7 @@ python -m load_test.simulate
 
 ```
 src/
-  proxy.py       # FastAPI app — /v1/chat/completions and supporting endpoints
+  proxy.py       # FastAPI app: /v1/chat/completions and supporting endpoints
   cache.py       # Qdrant-backed semantic cache with TTL eviction
   embedder.py    # pluggable embedder (local MiniLM / OpenAI)
   upstream.py    # upstream provider abstraction (OpenAI / Anthropic)
